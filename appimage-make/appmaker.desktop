@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=appmaker
+Exec=appimagetool
+Comment=Tool to generate AppImages from AppDirs
+Icon=appmaker
+Categories=Development;
+Terminal=true
+

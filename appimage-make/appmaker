@@ -1,0 +1,59 @@
+path="$(dirname "$(readlink -f "$0")")"
+read -p "please input your appimage path :" path2
+if  [ ! -n "$path2" ] ;then
+    exit
+fi
+path2=`echo $path2 | sed $'s/\'//g'`
+
+#apprun
+cp "$path/AppRun" "$path2"
+read -p "please input your appimage name :" name1
+if  [ ! -n "$name1" ] ;then
+    exit
+fi
+read -p "please input your appimage 可执行文件 :" name2
+if  [ ! -n "$name2" ] ;then
+    exit
+fi
+name1=`echo $name1 | sed $'s/\'//g'`
+name2=`echo $name2 | sed $'s/\'//g'`
+name1=${name1##*/}
+sed -i "s/appmaker/$name1/1" "$path2/AppRun"
+name2=${name2//"$path2/"};
+sed -i "s/appmaker/$name2/2" "$path2/AppRun"
+
+#.desktop and icon
+read -p "please input your .desktop :" dek
+read -p "please input your icon :" icn
+
+if  [ ! -n "$dek" ] ;then
+    dek="$path/appmaker.desktop"
+fi
+
+if  [ ! -n "$icn" ] ;then
+    icn="$path/appmaker.png"
+fi
+
+dek=`echo $dek | sed $'s/\'//g'`
+icn=`echo $icn | sed $'s/\'//g'`
+
+#cp
+icon=${dek##*/}
+icon="$name1.${icon##*.}"
+dir1="$path2/$icon"
+cp $dek "$path2/$icon"
+icon=${icn##*/}
+icon="$name1.${icon##*.}"
+cp $icn "$path2/$icon"
+
+#changename
+line=`sed -n '/Name=/p' $dir1`
+line2="Name=$name1"
+sed -i "s/$line/$line2/1" $dir1
+
+line=`sed -n '/Icon=/p' $dir1`
+line2="Icon=$name1"
+sed -i "s/$line/$line2/g" $dir1
+
+ARCH=x86_64 $path/appimagetool $path2
+
